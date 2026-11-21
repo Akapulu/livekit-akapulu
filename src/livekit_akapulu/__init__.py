@@ -2,9 +2,10 @@
 
 from livekit_akapulu.avatar import AvatarSession
 from livekit_akapulu.call import (
-    AVATAR_IDENTITY,
-    AVATAR_NAME,
-    BROWSER_NAME,
+    LIVEKIT_AVATAR_IDENTITY,
+    LIVEKIT_AVATAR_NAME,
+    LIVEKIT_BROWSER_IDENTITY,
+    LIVEKIT_BROWSER_NAME,
     SAMPLE_RATE,
     SPEAKING_TOPIC,
     STATUS_TOPIC,
@@ -15,9 +16,10 @@ from livekit_akapulu.call import (
 )
 
 __all__ = [
-    "AVATAR_IDENTITY",
-    "AVATAR_NAME",
-    "BROWSER_NAME",
+    "LIVEKIT_AVATAR_IDENTITY",
+    "LIVEKIT_AVATAR_NAME",
+    "LIVEKIT_BROWSER_IDENTITY",
+    "LIVEKIT_BROWSER_NAME",
     "SAMPLE_RATE",
     "SPEAKING_TOPIC",
     "STATUS_TOPIC",

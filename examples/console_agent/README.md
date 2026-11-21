@@ -17,8 +17,7 @@ cp .env.example .env
 Fill `.env`:
 
 - `LIVEKIT_URL`, `LIVEKIT_API_KEY`, `LIVEKIT_API_SECRET` from your LiveKit Cloud project (Inference must be enabled; this agent uses LiveKit Inference for Flux / GPT / Cartesia).
-- `AKAPULU_API_URL` (usually `https://akapulu.com`)
-- `AKAPULU_API_KEY` and `AKAPULU_AVATAR_ID` from the [Akapulu dashboard](https://akapulu.com/)
+- `AKAPULU_API_KEY` and `AKAPULU_AVATAR_ID` from the Akapulu dashboard.
 
 The default Cartesia voice is Carson (male). Change `_CARTESIA_VOICE_ID` in `agent.py` if your avatar face is female.
 

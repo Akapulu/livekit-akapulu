@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.1.2] - 2026-11-21
+
+- Rename `conversation_session_id` to `session_id` on `AvatarSession`.
+- Rename participant constants to `LIVEKIT_AVATAR_*` / `LIVEKIT_BROWSER_*`.
+- Default the Akapulu API origin to production when `AKAPULU_API_URL` is unset.
+- Remove the hosted/landing package path; pass `session_id` from
+  `create_akapulu_livekit_call` (or a prior live-sessions POST).
+- Examples await `wait_until_call_ready` before greeting.
+
 ## [0.1.1] - 2026-11-21
 
 - When subscriber `call_is_ready` unlocks after decoded Avatar video frames, send

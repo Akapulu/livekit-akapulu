@@ -1,20 +1,19 @@
 """Send assistant PCM to the Akapulu avatar worker over LiveKit.
 
-Plugin path: mints an Avatar participant JWT (publish_on_behalf of the voice
-agent), POSTs ``/api/live-sessions/`` with ``transport=livekit``, opens the
-worker control + audio sockets, and feeds assistant PCM over the same wire
-format as ``pipecat-akapulu``:
+``AvatarSession.start`` mints an Avatar participant JWT (publish_on_behalf of
+the voice agent), POSTs ``/api/live-sessions/`` with ``transport=livekit``,
+opens the worker control + audio sockets, and feeds assistant PCM over the
+same wire format as ``pipecat-akapulu``:
 
   A + uint32 ingest sequence + 24 kHz s16
   {"type":"speaking","who":"bot"|"user","state":"started"|"stopped"|"interrupted"}
   {"type":"call_ready"} after this session has decoded enough Avatar video frames
 
-Landing path: pass ``conversation_session_id`` for a session Django already
-created (with avatar token). Skips mint + POST connect; still opens worker
-sockets and feeds PCM.
+Pass ``session_id`` from ``create_akapulu_livekit_call`` (or a prior live-sessions
+POST) to skip mint + POST. Await ``wait_until_call_ready`` before greeting.
 
-``AKAPULU_API_URL`` selects the Django origin. Empty or non-http(s) raises.
 ``AKAPULU_API_KEY`` and ``AKAPULU_AVATAR_ID`` are required unless passed in.
+The API origin defaults to production; set ``AKAPULU_API_URL`` only to override.
 """
 
 from __future__ import annotations
@@ -47,8 +46,8 @@ from livekit.agents.voice.avatar import (
 )
 
 from livekit_akapulu.call import (
-    AVATAR_IDENTITY,
-    AVATAR_NAME,
+    LIVEKIT_AVATAR_IDENTITY,
+    LIVEKIT_AVATAR_NAME,
     SAMPLE_RATE,
     SPEAKING_TOPIC,
     STATUS_TOPIC,
@@ -74,9 +73,9 @@ class AvatarSession(BaseAvatarSession):
         avatar_id: NotGivenOr[str] = NOT_GIVEN,
         api_url: NotGivenOr[str] = NOT_GIVEN,
         api_key: NotGivenOr[str] = NOT_GIVEN,
-        conversation_session_id: NotGivenOr[str] = NOT_GIVEN,
-        avatar_participant_identity: str = AVATAR_IDENTITY,
-        avatar_participant_name: str = AVATAR_NAME,
+        session_id: NotGivenOr[str] = NOT_GIVEN,
+        avatar_participant_identity: str = LIVEKIT_AVATAR_IDENTITY,
+        avatar_participant_name: str = LIVEKIT_AVATAR_NAME,
         show_ai_label: bool = True,
     ) -> None:
         super().__init__()
@@ -107,13 +106,13 @@ class AvatarSession(BaseAvatarSession):
         self._avatar_participant_identity = avatar_participant_identity
         self._avatar_participant_name = avatar_participant_name
         self._preset_session_id: str | None = None
-        if is_given(conversation_session_id):
-            if not isinstance(conversation_session_id, str) or not conversation_session_id.strip():
-                raise RuntimeError("conversation_session_id is missing")
+        if is_given(session_id):
+            if not isinstance(session_id, str) or not session_id.strip():
+                raise RuntimeError("session_id is missing")
             try:
-                self._preset_session_id = str(uuid.UUID(conversation_session_id.strip()))
+                self._preset_session_id = str(uuid.UUID(session_id.strip()))
             except ValueError as exc:
-                raise RuntimeError("conversation_session_id must be a UUID") from exc
+                raise RuntimeError("session_id must be a UUID") from exc
         self._session_id: str | None = None
         self._audio_buffer: QueueAudioOutput | None = None
         self._main_atask: asyncio.Task | None = None
@@ -172,7 +171,7 @@ class AvatarSession(BaseAvatarSession):
 
         self._http = aiohttp.ClientSession()
         if self._preset_session_id is not None:
-            # Landing already created the ConversationSession + avatar token.
+            # create_akapulu_livekit_call (or a prior POST) already opened the session.
             self._session_id = self._preset_session_id
         else:
             try:
@@ -204,7 +203,7 @@ class AvatarSession(BaseAvatarSession):
                 avatar_token=avatar_token,
             )
         logger.info(
-            "akapulu livekit session_id=%s api=%s avatar_id=%s preset=%s",
+            "akapulu livekit session_id=%s api=%s avatar_id=%s reused_session=%s",
             self._session_id,
             self._api_origin,
             self._avatar_id,
