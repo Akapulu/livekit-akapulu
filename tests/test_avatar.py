@@ -68,6 +68,16 @@ def test_avatar_uses_shared_call_helpers() -> None:
         raise RuntimeError("avatar still has inline _post_connect")
 
 
+
+
+def test_avatar_uses_session_id_not_landing_name() -> None:
+    if "conversation_session_id" in _AVATAR:
+        raise RuntimeError("avatar still uses conversation_session_id")
+    if "session_id: NotGivenOr[str]" not in _AVATAR:
+        raise RuntimeError("avatar missing session_id ctor arg")
+    if "Landing path" in _AVATAR or "Landing already" in _AVATAR:
+        raise RuntimeError("avatar still documents a landing path")
+
 def test_avatar_tells_worker_call_ready() -> None:
     mark = _AVATAR.split("async def _mark_call_ready(", 1)[1].split(
         "def _on_video_watch_done(", 1
@@ -84,4 +94,5 @@ if __name__ == "__main__":
     test_avatar_watches_subscribed_track_not_camera_source_filter()
     test_avatar_uses_shared_call_helpers()
     test_avatar_tells_worker_call_ready()
+    test_avatar_uses_session_id_not_landing_name()
     print("ok")

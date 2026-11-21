@@ -28,7 +28,7 @@ await avatar.start(agent_session, ctx.room)
 await avatar.wait_until_call_ready()
 ```
 
-`AvatarSession.start` mints the Avatar participant JWT (`publish_on_behalf` of your agent), `POST /api/live-sessions/` with `transport=livekit`, opens the worker sockets, and forwards assistant PCM. Set `AKAPULU_API_URL`, `AKAPULU_API_KEY`, `AKAPULU_AVATAR_ID`, `LIVEKIT_URL`, `LIVEKIT_API_KEY`, and `LIVEKIT_API_SECRET`.
+`AvatarSession.start` mints the Avatar participant JWT (`publish_on_behalf` of your agent), `POST /api/live-sessions/` with `transport=livekit`, opens the worker sockets, and forwards assistant PCM. Set `AKAPULU_API_KEY`, `AKAPULU_AVATAR_ID`, `LIVEKIT_URL`, `LIVEKIT_API_KEY`, and `LIVEKIT_API_SECRET`.
 
 ### Connect helper (create room + session from your server)
 
@@ -44,21 +44,14 @@ livekit_url, room_name, agent_token, browser_token, session_id = (
         session=session,
     )
 )
-avatar = AvatarSession(conversation_session_id=session_id)
-```
-
-### Hosted / landing path
-
-When Django already created the conversation session and Avatar token, pass that id:
-
-```python
-avatar = AvatarSession(conversation_session_id=session_id)
+avatar = AvatarSession(session_id=session_id)
 await avatar.start(agent_session, room)
+await avatar.wait_until_call_ready()
 ```
 
 ## Status and speaking topics
 
-While the worker boots, the plugin republishes loading status on LiveKit data topic `akapulu.avatar.status` (same fields as Pipecat RTVI `type: status`: `call_is_ready`, `completion_percent`, `latest_update_text`). Bot speaking edges go on `akapulu.avatar.speaking`. Keep the loading UI up until `call_is_ready` is true. `wait_until_call_ready()` waits until this session has decoded enough Avatar video frames.
+While the worker boots, the plugin republishes loading status on LiveKit data topic `akapulu.avatar.status` (same fields as Pipecat RTVI `type: status`: `call_is_ready`, `completion_percent`, `latest_update_text`). Bot speaking edges go on `akapulu.avatar.speaking`. Keep the loading UI up until `call_is_ready` is true. `wait_until_call_ready()` waits until this session has decoded enough Avatar video frames. Await it before greeting.
 
 ## Wire format
 

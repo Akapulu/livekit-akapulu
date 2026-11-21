@@ -11,7 +11,7 @@ returns the LiveKit URL, room name, agent token, browser token, and
 
 A bot that already has a LiveKit room skips that helper. Mint the Avatar
 token with ``mint_avatar_token``, POST with ``post_akapulu_livekit_session``,
-then pass ``conversation_session_id`` into ``AvatarSession``, or let
+then pass ``session_id`` into ``AvatarSession``, or let
 ``AvatarSession.start`` mint and POST itself.
 """
 
@@ -25,19 +25,23 @@ import aiohttp
 from livekit import api
 from livekit.agents.voice.room_io import ATTRIBUTE_PUBLISH_ON_BEHALF
 
-BROWSER_NAME = "You"
-AVATAR_IDENTITY = "Avatar"
-AVATAR_NAME = "Avatar"
+# LiveKit participant identity / name for the Akapulu Labs worker.
+LIVEKIT_AVATAR_IDENTITY = "Avatar"
+LIVEKIT_AVATAR_NAME = "Avatar"
+# LiveKit participant identity / name for the browser.
+LIVEKIT_BROWSER_IDENTITY = "You"
+LIVEKIT_BROWSER_NAME = "You"
 STATUS_TOPIC = "akapulu.avatar.status"
 SPEAKING_TOPIC = "akapulu.avatar.speaking"
 SAMPLE_RATE = 24000
 ROOM_EMPTY_TIMEOUT_SECS = 2 * 60 * 60
+_PROD_DJANGO_ORIGIN = "https://akapulu.com"
 
 
 def django_origin() -> str:
     raw = os.environ.get("AKAPULU_API_URL")
-    if raw is None or not str(raw).strip():
-        raise RuntimeError("AKAPULU_API_URL is missing")
+    if raw is None:
+        return _PROD_DJANGO_ORIGIN
     origin = str(raw).strip().rstrip("/")
     if not (origin.startswith("https://") or origin.startswith("http://")):
         raise RuntimeError("AKAPULU_API_URL must be an http(s) origin")
@@ -63,8 +67,8 @@ def mint_avatar_token(
     livekit_api_secret: str,
     room_name: str,
     agent_identity: str,
-    avatar_identity: str = AVATAR_IDENTITY,
-    avatar_name: str = AVATAR_NAME,
+    avatar_identity: str = LIVEKIT_AVATAR_IDENTITY,
+    avatar_name: str = LIVEKIT_AVATAR_NAME,
 ) -> str:
     """Mint the Avatar participant JWT (publish_on_behalf of the voice agent)."""
     key = _required_text(livekit_api_key, "livekit_api_key")
@@ -199,7 +203,7 @@ async def create_akapulu_livekit_call(
     session: aiohttp.ClientSession,
     room_name: str | None = None,
     agent_identity: str = "agent",
-    browser_identity: str = BROWSER_NAME,
+    browser_identity: str = LIVEKIT_BROWSER_IDENTITY,
     empty_timeout_secs: int = ROOM_EMPTY_TIMEOUT_SECS,
 ) -> tuple[str, str, str, str, str]:
     """Return livekit_url, room_name, agent_token, browser_token, session_id.
@@ -246,7 +250,7 @@ async def create_akapulu_livekit_call(
         livekit_api_secret=livekit_secret,
         room_name=name,
         identity=browser,
-        name=BROWSER_NAME,
+        name=LIVEKIT_BROWSER_NAME,
     )
     avatar_token = mint_avatar_token(
         livekit_api_key=livekit_key,
