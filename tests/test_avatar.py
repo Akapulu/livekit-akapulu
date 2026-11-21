@@ -77,6 +77,12 @@ def test_avatar_uses_session_id_not_landing_name() -> None:
         raise RuntimeError("avatar missing session_id ctor arg")
     if "Landing path" in _AVATAR or "Landing already" in _AVATAR:
         raise RuntimeError("avatar still documents a landing path")
+    if "_preset_session_id" in _AVATAR:
+        raise RuntimeError("avatar still uses _preset_session_id")
+    if "api_url: NotGivenOr" in _AVATAR or "api_key: NotGivenOr" in _AVATAR:
+        raise RuntimeError("avatar still accepts api_url/api_key ctor args")
+    if "livekit_api_key: NotGivenOr" in _AVATAR:
+        raise RuntimeError("start still accepts LiveKit secret kwargs")
 
 def test_avatar_tells_worker_call_ready() -> None:
     mark = _AVATAR.split("async def _mark_call_ready(", 1)[1].split(

@@ -28,7 +28,7 @@ await avatar.start(agent_session, ctx.room)
 await avatar.wait_until_call_ready()
 ```
 
-`AvatarSession.start` mints the Avatar participant JWT (`publish_on_behalf` of your agent), `POST /api/live-sessions/` with `transport=livekit`, opens the worker sockets, and forwards assistant PCM. Set `AKAPULU_API_KEY`, `AKAPULU_AVATAR_ID`, `LIVEKIT_URL`, `LIVEKIT_API_KEY`, and `LIVEKIT_API_SECRET`.
+`AvatarSession.start` mints the Avatar participant JWT (`publish_on_behalf` of your agent), `POST /api/live-sessions/` with `transport=livekit`, opens the worker sockets, and forwards assistant PCM. Credentials come from the environment: `AKAPULU_API_KEY`, `AKAPULU_AVATAR_ID`, `LIVEKIT_URL`, `LIVEKIT_API_KEY`, and `LIVEKIT_API_SECRET`.
 
 ### Connect helper (create room + session from your server)
 

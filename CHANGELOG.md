@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.3] - 2026-11-21
+
+- `AvatarSession` takes Akapulu and LiveKit credentials from the environment
+  only (no `api_key` / `api_url` / LiveKit secret constructor args).
+- `AKAPULU_API_KEY` is required only when `start` must POST a new live session.
+
 ## [0.1.2] - 2026-11-21
 
 - Rename `conversation_session_id` to `session_id` on `AvatarSession`.
