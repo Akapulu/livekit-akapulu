@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- `examples/console_agent`: minimal LiveKit Agents worker for Agent Console (`python agent.py dev`).
+
 ## [0.1.0] - 2026-11-20
 
 - Initial public release.

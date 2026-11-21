@@ -12,6 +12,10 @@ Requires `livekit-agents` 1.8 or newer.
 uv add livekit-akapulu
 ```
 
+## Try in Agent Console
+
+A minimal worker lives in [`examples/console_agent`](examples/console_agent). Copy `.env.example`, run `python agent.py dev`, then open **Launch Console** in your LiveKit Cloud project. Details: [`examples/console_agent/README.md`](examples/console_agent/README.md).
+
 ## Use
 
 ### Plugin path (voice agent already in a LiveKit room)
