@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.1] - 2026-11-21
+
+- When subscriber `call_is_ready` unlocks after decoded Avatar video frames, send
+  `{"type":"call_ready"}` on the private audio socket so the worker can stamp
+  Django `call_is_ready_at`.
+
 ## Unreleased
 
 - `examples/console_agent`: minimal LiveKit Agents worker for Agent Console (`python agent.py dev`).
