@@ -1,0 +1,38 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "livekit-akapulu"
+version = "0.1.0"
+description = "LiveKit Agents avatar session that sends assistant audio to an Akapulu Labs avatar."
+readme = "README.md"
+license = "BSD-2-Clause"
+license-files = ["LICENSE"]
+requires-python = ">=3.11"
+authors = [{ name = "Akapulu Labs" }]
+keywords = ["livekit", "akapulu", "avatar", "webrtc"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: BSD License",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Multimedia :: Video",
+]
+dependencies = [
+    "aiohttp>=3.9.0,<4",
+    "livekit-agents~=1.8",
+]
+
+[project.urls]
+Homepage = "https://akapulu.com"
+Repository = "https://github.com/Akapulu/livekit-akapulu"
+Documentation = "https://docs.akapulu.com"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/livekit_akapulu"]
+
+[tool.hatch.build.targets.wheel.sources]
+"src" = ""
