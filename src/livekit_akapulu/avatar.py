@@ -7,6 +7,7 @@ format as ``pipecat-akapulu``:
 
   A + uint32 ingest sequence + 24 kHz s16
   {"type":"speaking","who":"bot"|"user","state":"started"|"stopped"|"interrupted"}
+  {"type":"call_ready"} after this session has decoded enough Avatar video frames
 
 Landing path: pass ``conversation_session_id`` for a session Django already
 created (with avatar token). Skips mint + POST connect; still opens worker
@@ -346,22 +347,6 @@ class AvatarSession(BaseAvatarSession):
             logger.info("akapulu avatar speaking who=%s state=%s", who, state)
 
 
-    def _post_call_ready(self) -> None:
-        body = json.dumps({"column": "call_is_ready_at"}).encode("utf-8")
-        request = urllib_request.Request(
-            self._status_url(),
-            data=body,
-            headers={"Content-Type": "application/json"},
-            method="POST",
-        )
-        try:
-            with urllib_request.urlopen(request, timeout=15) as response:
-                if response.status != 200:
-                    raise RuntimeError(f"call_is_ready stamp returned {response.status}")
-        except urllib_error.HTTPError as exc:
-            err = exc.read().decode("utf-8", errors="replace")
-            raise RuntimeError(f"call_is_ready stamp returned {exc.code} {err}") from exc
-
     async def _mark_call_ready(self) -> None:
         if self._ready_emitted or self._closed:
             return
@@ -379,7 +364,7 @@ class AvatarSession(BaseAvatarSession):
                 "completion_percent": 100,
             }
         )
-        await asyncio.to_thread(self._post_call_ready)
+        await self._send_or_queue(json.dumps({"type": "call_ready"}))
 
     def _on_video_watch_done(self, task: asyncio.Task) -> None:
         if task.cancelled():
@@ -474,7 +459,9 @@ class AvatarSession(BaseAvatarSession):
         ``wait_for_join`` only means the Avatar participant and video track
         exist. The opening greeting must wait until this bot has received
         ``_READY_VIDEO_FRAMES`` decoded frames, same gate as the Pipecat
-        hosted bot. Unlock also POSTs Django ``call_is_ready_at``.
+        hosted bot. Unlock also sends ``{"type":"call_ready"}`` on the
+        private audio socket so the worker can stamp Django
+        ``call_is_ready_at``.
         """
         if not isinstance(timeout, (int, float)) or isinstance(timeout, bool) or timeout <= 0:
             raise RuntimeError(f"akapulu avatar call_is_ready timeout is {timeout!r}")
@@ -519,8 +506,8 @@ class AvatarSession(BaseAvatarSession):
         if type(percent) is not int:
             raise RuntimeError("akapulu avatar status completion_percent is missing")
         # Worker status always claims call_is_ready false. Official ready is
-        # subscriber video frames (see _mark_call_ready), which also stamps
-        # Django call_is_ready_at.
+        # subscriber video frames (see _mark_call_ready), which also tells
+        # the worker to stamp Django call_is_ready_at.
         ready_out = self._call_ready.is_set()
         if not self._room_can_publish():
             logger.info(

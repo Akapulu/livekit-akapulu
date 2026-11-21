@@ -68,14 +68,14 @@ def test_avatar_uses_shared_call_helpers() -> None:
         raise RuntimeError("avatar still has inline _post_connect")
 
 
-def test_avatar_stamps_django_call_is_ready() -> None:
+def test_avatar_tells_worker_call_ready() -> None:
     mark = _AVATAR.split("async def _mark_call_ready(", 1)[1].split(
         "def _on_video_watch_done(", 1
     )[0]
-    if "_post_call_ready" not in mark:
-        raise RuntimeError("_mark_call_ready does not stamp Django call_is_ready_at")
-    if '{"column": "call_is_ready_at"}' not in _AVATAR:
-        raise RuntimeError("avatar does not POST call_is_ready_at")
+    if '{"type": "call_ready"}' not in mark:
+        raise RuntimeError("_mark_call_ready does not send call_ready on the audio socket")
+    if "_send_or_queue" not in mark:
+        raise RuntimeError("_mark_call_ready does not send call_ready via _send_or_queue")
 
 
 if __name__ == "__main__":
@@ -83,5 +83,5 @@ if __name__ == "__main__":
     test_avatar_aclose_unblocks_idle_and_closes_audio_first()
     test_avatar_watches_subscribed_track_not_camera_source_filter()
     test_avatar_uses_shared_call_helpers()
-    test_avatar_stamps_django_call_is_ready()
+    test_avatar_tells_worker_call_ready()
     print("ok")
