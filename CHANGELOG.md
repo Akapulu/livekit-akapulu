@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.1] - 2026-11-21
+
+- When subscriber `call_is_ready` unlocks after decoded Avatar video frames, POST
+  `{"column": "call_is_ready_at"}` to `POST /api/live-sessions/<id>/status/` so
+  Django status and User Report cold start use the tap gate.
+
 ## Unreleased
 
 - `examples/console_agent`: minimal LiveKit Agents worker for Agent Console (`python agent.py dev`).
