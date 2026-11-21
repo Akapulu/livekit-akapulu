@@ -1,0 +1,3 @@
+# Install the package from this repo (editable) plus dotenv for .env loading.
+-e ../..
+python-dotenv>=1.0.0
