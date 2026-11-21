@@ -12,8 +12,9 @@ same wire format as ``pipecat-akapulu``:
 Pass ``session_id`` from ``create_akapulu_livekit_call`` (or a prior live-sessions
 POST) to skip mint + POST. Await ``wait_until_call_ready`` before greeting.
 
-``AKAPULU_API_KEY`` and ``AKAPULU_AVATAR_ID`` are required unless passed in.
-The API origin defaults to production; set ``AKAPULU_API_URL`` only to override.
+``AKAPULU_API_KEY`` and ``AKAPULU_AVATAR_ID`` come from the environment
+(``AKAPULU_API_KEY`` only when this session must POST). The API origin defaults
+to production; set ``AKAPULU_API_URL`` only to override.
 """
 
 from __future__ import annotations
@@ -71,8 +72,6 @@ class AvatarSession(BaseAvatarSession):
         self,
         *,
         avatar_id: NotGivenOr[str] = NOT_GIVEN,
-        api_url: NotGivenOr[str] = NOT_GIVEN,
-        api_key: NotGivenOr[str] = NOT_GIVEN,
         session_id: NotGivenOr[str] = NOT_GIVEN,
         avatar_participant_identity: str = LIVEKIT_AVATAR_IDENTITY,
         avatar_participant_name: str = LIVEKIT_AVATAR_NAME,
@@ -86,34 +85,20 @@ class AvatarSession(BaseAvatarSession):
             self._avatar_id = str(uuid.UUID(resolved_id.strip()))
         except ValueError as exc:
             raise RuntimeError("AKAPULU_AVATAR_ID must be a UUID") from exc
-        if is_given(api_url):
-            if not isinstance(api_url, str) or not api_url.strip():
-                raise RuntimeError("api_url is missing")
-            origin = api_url.strip().rstrip("/")
-            if not (origin.startswith("https://") or origin.startswith("http://")):
-                raise RuntimeError("api_url must be an http(s) origin")
-            self._api_origin = origin
-        else:
-            self._api_origin = django_origin()
-        self._api_key = (
-            api_key.strip()
-            if is_given(api_key) and isinstance(api_key, str)
-            else required_env("AKAPULU_API_KEY")
-        )
+        self._api_origin = django_origin()
         if not isinstance(show_ai_label, bool):
             raise RuntimeError("show_ai_label must be a boolean")
         self._show_ai_label = show_ai_label
         self._avatar_participant_identity = avatar_participant_identity
         self._avatar_participant_name = avatar_participant_name
-        self._preset_session_id: str | None = None
+        self._session_id: str | None = None
         if is_given(session_id):
             if not isinstance(session_id, str) or not session_id.strip():
                 raise RuntimeError("session_id is missing")
             try:
-                self._preset_session_id = str(uuid.UUID(session_id.strip()))
+                self._session_id = str(uuid.UUID(session_id.strip()))
             except ValueError as exc:
                 raise RuntimeError("session_id must be a UUID") from exc
-        self._session_id: str | None = None
         self._audio_buffer: QueueAudioOutput | None = None
         self._main_atask: asyncio.Task | None = None
         self._http: aiohttp.ClientSession | None = None
@@ -149,31 +134,21 @@ class AvatarSession(BaseAvatarSession):
         self,
         agent_session: AgentSession,
         room: rtc.Room,
-        *,
-        livekit_url: NotGivenOr[str] = NOT_GIVEN,
-        livekit_api_key: NotGivenOr[str] = NOT_GIVEN,
-        livekit_api_secret: NotGivenOr[str] = NOT_GIVEN,
     ) -> None:
         await super().start(agent_session, room)
-        livekit_url = livekit_url or (os.getenv("LIVEKIT_URL") or NOT_GIVEN)
-        livekit_api_key = livekit_api_key or (os.getenv("LIVEKIT_API_KEY") or NOT_GIVEN)
-        livekit_api_secret = livekit_api_secret or (os.getenv("LIVEKIT_API_SECRET") or NOT_GIVEN)
-        if not livekit_url or not livekit_api_key or not livekit_api_secret:
-            raise RuntimeError(
-                "livekit_url, livekit_api_key, and livekit_api_secret must be set"
-            )
-        if not isinstance(livekit_url, str) or not (
+        livekit_url = required_env("LIVEKIT_URL")
+        livekit_api_key = required_env("LIVEKIT_API_KEY")
+        livekit_api_secret = required_env("LIVEKIT_API_SECRET")
+        if not (
             livekit_url.startswith("wss://") or livekit_url.startswith("ws://")
         ):
-            raise RuntimeError("livekit_url must be wss://")
+            raise RuntimeError("LIVEKIT_URL must be wss://")
         if not room.name:
             raise RuntimeError("livekit room name is missing")
 
         self._http = aiohttp.ClientSession()
-        if self._preset_session_id is not None:
-            # create_akapulu_livekit_call (or a prior POST) already opened the session.
-            self._session_id = self._preset_session_id
-        else:
+        reused_session = self._session_id is not None
+        if not reused_session:
             try:
                 job_ctx = get_job_context()
                 local_identity = job_ctx.local_participant_identity
@@ -195,7 +170,7 @@ class AvatarSession(BaseAvatarSession):
             self._session_id = await post_akapulu_livekit_session(
                 session=self._http,
                 api_origin=self._api_origin,
-                api_key=self._api_key,
+                api_key=required_env("AKAPULU_API_KEY"),
                 avatar_id=self._avatar_id,
                 show_ai_label=self._show_ai_label,
                 room_url=livekit_url,
@@ -207,7 +182,7 @@ class AvatarSession(BaseAvatarSession):
             self._session_id,
             self._api_origin,
             self._avatar_id,
-            self._preset_session_id is not None,
+            reused_session,
         )
 
         self._audio_buffer = QueueAudioOutput(sample_rate=SAMPLE_RATE, wait_playback_start=True)
