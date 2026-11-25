@@ -24,6 +24,7 @@
 ## Unreleased
 
 - `examples/console_agent`: minimal LiveKit Agents worker for Agent Console (`python agent.py dev`).
+- Always use the Akapulu Labs production API origin (no `AKAPULU_API_URL` override).
 
 ## [0.1.0] - 2026-11-20
 

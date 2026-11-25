@@ -39,13 +39,7 @@ _PROD_DJANGO_ORIGIN = "https://akapulu.com"
 
 
 def django_origin() -> str:
-    raw = os.environ.get("AKAPULU_API_URL")
-    if raw is None:
-        return _PROD_DJANGO_ORIGIN
-    origin = str(raw).strip().rstrip("/")
-    if not (origin.startswith("https://") or origin.startswith("http://")):
-        raise RuntimeError("AKAPULU_API_URL must be an http(s) origin")
-    return origin
+    return _PROD_DJANGO_ORIGIN
 
 
 def required_env(name: str) -> str:
