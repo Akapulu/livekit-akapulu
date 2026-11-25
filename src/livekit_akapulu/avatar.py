@@ -13,8 +13,8 @@ Pass ``session_id`` from ``create_akapulu_livekit_call`` (or a prior live-sessio
 POST) to skip mint + POST. Await ``wait_until_call_ready`` before greeting.
 
 ``AKAPULU_API_KEY`` and ``AKAPULU_AVATAR_ID`` come from the environment
-(``AKAPULU_API_KEY`` only when this session must POST). The API origin defaults
-to production; set ``AKAPULU_API_URL`` only to override.
+(``AKAPULU_API_KEY`` only when this session must POST). The API origin is the
+Akapulu Labs production API.
 """
 
 from __future__ import annotations
@@ -287,7 +287,7 @@ class AvatarSession(BaseAvatarSession):
                 await self._audio_ws.send_bytes(message)
 
     async def _publish_speaking(self, who: str, state: str) -> None:
-        """Tell the browser when bot playback starts/stops (harness wait)."""
+        """Tell the browser when bot playback starts/stops."""
         if who != "bot":
             return
         if state not in ("started", "stopped", "interrupted"):
