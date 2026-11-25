@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.1.4] - 2026-11-25
+
+- Wait for `room.isconnected()` before reading `local_participant` during
+  avatar video ready (start can race ahead of the agent room connect).
+- Always use the Akapulu Labs production API origin (no `AKAPULU_API_URL`
+  override).
+- `examples/console_agent`: unnamed local worker for Agent Console, Hollis
+  default avatar id, Carson voice notes, and a ~10s load note.
+
 ## [0.1.3] - 2026-11-21
 
 - `AvatarSession` takes Akapulu and LiveKit credentials from the environment
@@ -20,11 +29,6 @@
 - When subscriber `call_is_ready` unlocks after decoded Avatar video frames, send
   `{"type":"call_ready"}` on the private audio socket so the worker can stamp
   Django `call_is_ready_at`.
-
-## Unreleased
-
-- `examples/console_agent`: minimal LiveKit Agents worker for Agent Console (`python agent.py dev`).
-- Always use the Akapulu Labs production API origin (no `AKAPULU_API_URL` override).
 
 ## [0.1.0] - 2026-11-20
 

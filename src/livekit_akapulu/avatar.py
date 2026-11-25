@@ -358,8 +358,12 @@ class AvatarSession(BaseAvatarSession):
             for remote in room.remote_participants.values():
                 if remote.identity == self._avatar_participant_identity:
                     return remote
-            if room.local_participant.identity == self._avatar_participant_identity:
-                return room.local_participant
+            # Video watch can start from AvatarSession.start before
+            # AgentSession connects the room. Wait for connect before
+            # touching local_participant.
+            if room.isconnected():
+                if room.local_participant.identity == self._avatar_participant_identity:
+                    return room.local_participant
             if time.perf_counter() >= deadline:
                 raise TimeoutError(
                     "akapulu avatar participant was not found for video ready"

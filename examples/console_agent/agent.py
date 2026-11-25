@@ -38,11 +38,10 @@ _REQUIRED_ENV = (
     "AKAPULU_AVATAR_ID",
 )
 
-# Carson (male). Change if your avatar_id is a female face.
+# Carson (male). Match Hollis. Ariana is ec1e269e-9ca0-402f-8a18-58e0e022355a.
 _CARTESIA_VOICE_ID = "86e30c1d-714b-4074-a1f2-1cb6b552fb49"
 _EAGER_EOT_THRESHOLD = 0.5
 _AVATAR_JOIN_TIMEOUT_SECS = 180.0
-_AGENT_NAME = "akapulu-avatar"
 
 
 def _require_env() -> None:
@@ -69,7 +68,8 @@ class Assistant(Agent):
 server = AgentServer()
 
 
-@server.rtc_session(agent_name=_AGENT_NAME)
+# Unnamed so Console auto-dispatches when no agent is selected.
+@server.rtc_session()
 async def voice_bot(ctx: agents.JobContext) -> None:
     _require_env()
 
