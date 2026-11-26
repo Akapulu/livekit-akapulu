@@ -51,11 +51,9 @@ await avatar.wait_until_call_ready()
 
 ## Status and speaking topics
 
-While the worker boots, the plugin republishes loading status on LiveKit data topic `akapulu.avatar.status` (same fields as Pipecat RTVI `type: status`: `call_is_ready`, `completion_percent`, `latest_update_text`). Bot speaking edges go on `akapulu.avatar.speaking`. Keep the loading UI up until `call_is_ready` is true. `wait_until_call_ready()` waits until this session has decoded enough Avatar video frames. Await it before greeting.
+While the worker boots, the plugin republishes loading status on LiveKit data topic `akapulu.avatar.status` (`call_is_ready`, `completion_percent`, `latest_update_text`). Bot speaking edges go on `akapulu.avatar.speaking`. Keep the loading UI up until `call_is_ready` is true. `wait_until_call_ready()` waits until this session has decoded enough Avatar video frames. Await it before greeting.
 
 ## Wire format
-
-Same as `pipecat-akapulu`:
 
 - ingest audio: `A` + uint32 sequence + 24 kHz s16 PCM
 - speaking: `{"type":"speaking","who":"bot"|"user","state":"started"|"stopped"|"interrupted"}`

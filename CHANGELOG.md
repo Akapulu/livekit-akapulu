@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.1.6] - 2026-11-25
+
+- Package README: drop Pipecat cross-references from status topics and wire
+  format.
+
 ## [0.1.5] - 2026-11-25
 
 - Package README links to `examples/console_agent` use absolute GitHub URLs
