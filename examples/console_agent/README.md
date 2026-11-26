@@ -47,6 +47,6 @@ Console mode is audio-first; use `dev` + Agent Console to see the avatar video.
 ## Notes
 
 - After **Start session**, wait about 10 seconds for the avatar worker to load before expecting video or the greeting.
-- STT stays muted until `wait_until_call_ready` (same idea as the Pipecat Flux gate).
+- STT stays muted until `wait_until_call_ready`.
 - Loading status is on LiveKit data topic `akapulu.avatar.status` (Agent Console does not show a spinner for that topic).
 - Full plugin docs: https://docs.akapulu.com/guides/calls/livekit
