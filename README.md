@@ -14,7 +14,7 @@ uv add livekit-akapulu
 
 ## Try in Agent Console
 
-A minimal worker lives in [`examples/console_agent`](examples/console_agent). Copy `.env.example`, run `python agent.py dev`, then open **Launch Console** in your LiveKit Cloud project. Details: [`examples/console_agent/README.md`](examples/console_agent/README.md).
+A minimal worker lives in [`examples/console_agent`](https://github.com/Akapulu/livekit-akapulu/tree/main/examples/console_agent). Copy `.env.example`, run `python agent.py dev`, then open **Launch Console** in your LiveKit Cloud project. Details: [`examples/console_agent/README.md`](https://github.com/Akapulu/livekit-akapulu/blob/main/examples/console_agent/README.md).
 
 ## Use
 

@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.1.5] - 2026-11-25
+
+- Package README links to `examples/console_agent` use absolute GitHub URLs
+  so they work on PyPI.
+
 ## [0.1.4] - 2026-11-25
 
 - Wait for `room.isconnected()` before reading `local_participant` during
