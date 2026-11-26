@@ -20,7 +20,7 @@ Fill `.env`:
 - `AKAPULU_API_KEY` from the Akapulu dashboard.
 - `AKAPULU_AVATAR_ID`: defaults to Hollis (`1285bfe4-3512-4b34-93ad-196098597a1c`) in `.env.example`.
 
-The default Cartesia voice is Carson (male), for Hollis. Change `_CARTESIA_VOICE_ID` in `agent.py` if your avatar face is female (Ariana: `ec1e269e-9ca0-402f-8a18-58e0e022355a`).
+The default Cartesia voice is Carson (male), for Hollis. Change `_CARTESIA_VOICE_ID` in `agent.py` if your avatar face is female.
 
 ## Run and open Console
 
